@@ -1,0 +1,187 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 250 100% 99%;
+    --foreground: 260 60% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 260 60% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 260 60% 10%;
+
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 270 90% 68%;
+
+    --secondary: 250 100% 98%;
+    --secondary-foreground: 260 60% 10%;
+
+    --muted: 250 100% 97%;
+    --muted-foreground: 260 30% 50%;
+
+    --accent: 280 89% 65%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 250 40% 90%;
+    --input: 250 40% 90%;
+    --ring: 262 83% 58%;
+
+    --radius: 1rem;
+
+    --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%) 0%, hsl(280 89% 65%) 50%, hsl(290 95% 70%) 100%);
+    --gradient-bg: linear-gradient(180deg, hsl(250 100% 99%) 0%, hsl(260 100% 98%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(262 83% 98%) 0%, hsl(280 89% 99%) 100%);
+    
+    --shadow-card: 0 4px 20px hsl(262 83% 58% / 0.15), 0 2px 8px hsl(262 83% 58% / 0.1);
+    --shadow-card-hover: 0 12px 40px hsl(262 83% 58% / 0.25), 0 6px 16px hsl(262 83% 58% / 0.15);
+    --shadow-glow: 0 0 40px hsl(270 90% 68% / 0.5);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5% 26%;
+    --sidebar-primary: 240 6% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 5% 96%;
+    --sidebar-accent-foreground: 240 6% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217 91% 60%;
+  }
+
+  .dark {
+    --background: 260 60% 8%;
+    --foreground: 250 100% 98%;
+
+    --card: 260 50% 12%;
+    --card-foreground: 250 100% 98%;
+
+    --popover: 260 50% 12%;
+    --popover-foreground: 250 100% 98%;
+
+    --primary: 270 90% 68%;
+    --primary-foreground: 260 60% 10%;
+    --primary-glow: 280 95% 75%;
+
+    --secondary: 260 40% 15%;
+    --secondary-foreground: 250 100% 98%;
+
+    --muted: 260 40% 15%;
+    --muted-foreground: 250 40% 70%;
+
+    --accent: 280 89% 65%;
+    --accent-foreground: 260 60% 10%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 250 100% 98%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 260 40% 20%;
+    --input: 260 40% 20%;
+    --ring: 270 90% 68%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%) 0%, hsl(280 89% 65%) 50%, hsl(290 95% 70%) 100%);
+    --gradient-bg: linear-gradient(180deg, hsl(260 60% 8%) 0%, hsl(260 50% 12%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(260 50% 15%) 0%, hsl(270 60% 18%) 100%);
+    
+    --shadow-card: 0 4px 20px hsl(270 90% 25% / 0.4), 0 2px 8px hsl(270 90% 25% / 0.3);
+    --shadow-card-hover: 0 12px 40px hsl(270 90% 35% / 0.5), 0 6px 16px hsl(270 90% 35% / 0.4);
+    --shadow-glow: 0 0 60px hsl(270 90% 68% / 0.6);
+
+    --sidebar-background: 240 6% 10%;
+    --sidebar-foreground: 240 5% 96%;
+    --sidebar-primary: 224 76% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 4% 16%;
+    --sidebar-accent-foreground: 240 5% 96%;
+    --sidebar-border: 240 4% 16%;
+    --sidebar-ring: 217 91% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply text-foreground;
+    background: var(--gradient-bg);
+    min-height: 100vh;
+  }
+}
+
+@layer utilities {
+  .glass-effect {
+    background: hsl(var(--card) / 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--border) / 0.5);
+  }
+
+  .glow-text {
+    text-shadow: 0 0 20px hsl(var(--primary) / 0.5),
+                 0 0 40px hsl(var(--primary) / 0.3);
+  }
+
+  .shadow-3xl {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25),
+                0 0 60px rgba(251, 191, 36, 0.4),
+                0 0 100px rgba(245, 158, 11, 0.2);
+  }
+
+  .animate-bounce-slow {
+    animation: bounce 3s ease-in-out infinite;
+  }
+
+  .animate-gradient-shift {
+    animation: gradient-shift 3s ease infinite;
+    background-size: 200% 200%;
+  }
+
+  .animate-spin-slow {
+    animation: spin 3s linear infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes gradient-shift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}

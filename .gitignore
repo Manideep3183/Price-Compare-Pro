@@ -1,0 +1,62 @@
+# Environment variables
+.env
+.env.local
+
+# Large installers
+*.msi
+node-v*.msi
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node modules
+node_modules/
+
+# Build outputs
+build/
+dist/
+
+# Old scraping files (deprecated)
+crawl_debug.py
+debug_crawl_amazon.py
+debug_crawl_flipkart.py
+run_local_testclient.py
+test_scraper.py
+scripts/
+tools/
+tests/
