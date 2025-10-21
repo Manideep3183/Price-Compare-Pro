@@ -38,6 +38,7 @@ app.add_middleware(
         "http://127.0.0.1:8081",
         "http://127.0.0.1:8082",
         "http://127.0.0.1:3000",
+        "https://*.vercel.app",  # Allow all Vercel deployments (preview & production)
     ],
     allow_credentials=True,
     allow_methods=["*"],
