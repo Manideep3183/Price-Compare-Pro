@@ -67,32 +67,17 @@ export const Login = () => {
     try {
       await loginWithGoogle();
       
-      // Check if user exists in MongoDB
+      // Always try to create/update profile - backend handles new vs existing users
       try {
-        const { checkUserExists } = await import('@/lib/api');
-        const userExists = await checkUserExists();
-        
-        if (!userExists) {
-          // No account found - redirect to signup
-          setError('No account found. Please sign up first.');
-          
-          // Sign out the user
-          const { auth } = await import('@/lib/firebase');
-          await auth.signOut();
-          setLoading(false);
-          return;
-        }
-        
-        // User exists - update profile and login
         await createOrUpdateUserProfile({
           auth_provider: 'google',
         });
         console.log('✅ Google user logged in successfully');
-        
         navigate('/');
       } catch (profileError) {
-        console.error('⚠️ Failed to verify/update profile:', profileError);
-        setError('Failed to complete sign-in. Please try again.');
+        console.error('⚠️ Failed to create/update profile:', profileError);
+        // If profile creation fails, user might need to sign up first
+        setError('Failed to complete sign-in. Please try signing up if you are a new user.');
         
         // Sign out the user on error
         const { auth } = await import('@/lib/firebase');

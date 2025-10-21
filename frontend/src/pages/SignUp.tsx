@@ -79,31 +79,15 @@ export const SignUp = () => {
     try {
       await loginWithGoogle();
       
-      // Check if user already exists in MongoDB
+      // Create/update user profile in MongoDB
       try {
-        const { checkUserExists } = await import('@/lib/api');
-        const userExists = await checkUserExists();
-        
-        if (userExists) {
-          // User already has an account
-          setError('Account already exists. Please use the Login page instead.');
-          
-          // Sign out the user
-          const { auth } = await import('@/lib/firebase');
-          await auth.signOut();
-          setLoading(false);
-          return;
-        }
-        
-        // Create new user profile in MongoDB (Google auth)
         await createOrUpdateUserProfile({
           auth_provider: 'google',
         });
-        console.log('✅ New Google user profile created in MongoDB');
-        
+        console.log('✅ Google user profile created in MongoDB');
         navigate('/');
       } catch (profileError) {
-        console.error('⚠️ Failed to check/create profile:', profileError);
+        console.error('⚠️ Failed to create profile:', profileError);
         setError('Failed to complete sign-up. Please try again.');
         
         // Sign out the user on error
