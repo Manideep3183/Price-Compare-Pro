@@ -51,38 +51,12 @@ const Index = () => {
     }
   }, [aiRecommendation]);
 
-  // Check if user still exists in database on page load
-  useEffect(() => {
-    const verifyUserExists = async () => {
-      if (user) {
-        try {
-          const exists = await checkUserExists();
-          if (!exists) {
-            console.log('⚠️ User no longer exists in database, logging out...');
-            toast({
-              title: "Account Deleted",
-              description: "Your account has been deleted. Please sign up again.",
-              variant: "destructive",
-            });
-            await logout();
-            navigate('/login');
-          }
-        } catch (error) {
-          console.error('Failed to verify user existence:', error);
-        }
-      }
-    };
-
-    verifyUserExists();
-  }, [user, logout, navigate, toast]);
-
-  // Ensure user profile exists in MongoDB (safety check for Google auth users)
+  // Ensure user profile exists in MongoDB (safety check for all auth users)
   useEffect(() => {
     const ensureUserProfile = async () => {
       if (user) {
         try {
-          // Try to create/update profile - this is idempotent
-          // If user was deleted and signed up again with Google, this recreates the profile
+          // Always create/update profile first - this is idempotent
           await createOrUpdateUserProfile({
             auth_provider: user.providerData?.[0]?.providerId === 'google.com' ? 'google' : 'email',
           });

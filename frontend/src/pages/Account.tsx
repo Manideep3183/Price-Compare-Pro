@@ -57,21 +57,7 @@ const Account = () => {
 
     const fetchData = async () => {
       try {
-        // Check if user still exists in database
-        const exists = await checkUserExists();
-        if (!exists) {
-          console.log('⚠️ User no longer exists in database, logging out...');
-          toast({
-            title: "Account Deleted",
-            description: "Your account has been deleted. Please sign up again.",
-            variant: "destructive",
-          });
-          await logout();
-          navigate('/login');
-          return;
-        }
-
-        // Ensure user profile exists (safety check for re-signup after deletion)
+        // Ensure user profile exists first (handles both new and existing users)
         try {
           await createOrUpdateUserProfile({
             auth_provider: user.providerData?.[0]?.providerId === 'google.com' ? 'google' : 'email',
