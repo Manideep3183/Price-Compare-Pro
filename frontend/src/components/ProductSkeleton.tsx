@@ -3,23 +3,21 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export const ProductSkeleton = () => {
   return (
-    <Card className="overflow-hidden backdrop-blur-sm bg-card/50 border-border/50">
+    <Card className="overflow-hidden">
       <CardHeader className="p-0">
-        <Skeleton className="h-56 w-full rounded-t-xl" />
+        <Skeleton className="aspect-square w-full" />
       </CardHeader>
-      <CardContent className="p-5 space-y-4">
-        <Skeleton className="h-12 w-full" />
-        <div className="flex items-center gap-3">
-          <Skeleton className="h-7 w-24" />
-          <Skeleton className="h-7 w-16" />
+      <CardContent className="p-4 space-y-3">
+        <Skeleton className="h-6 w-3/4" />
+        <Skeleton className="h-6 w-1/2" />
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-5 w-20" />
+          <Skeleton className="h-5 w-16" />
         </div>
-        <div className="flex items-center justify-between pt-2">
-          <Skeleton className="h-10 w-32" />
-          <Skeleton className="h-6 w-16" />
-        </div>
+        <Skeleton className="h-10 w-32" />
       </CardContent>
-      <CardFooter className="p-5 pt-0">
-        <Skeleton className="h-12 w-full rounded-xl" />
+      <CardFooter className="p-4 pt-0">
+        <Skeleton className="h-10 w-full" />
       </CardFooter>
     </Card>
   );

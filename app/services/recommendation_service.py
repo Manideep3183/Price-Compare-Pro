@@ -117,20 +117,71 @@ class SearchResponse(BaseModel):
 from .product_filter import filter_relevant_products
 
 def _calculate_recommendation(products: List[Product], search_query: str) -> List[Product]:
-    """Apply filtering and then a 70/30 heuristic: price (70%), rating (30%)."""
+    """Apply filtering and then a 70/30 heuristic: price (70%), rating (30%).
+    
+    Only considers products with:
+    - Rating > 3.5 (must have a rating)
+    - Price within reasonable range (not outliers)
+    """
     if not products:
         return []
         
     # First filter out irrelevant products
     relevant_products = filter_relevant_products(products, search_query)
     
-    prices = [p.price for p in relevant_products if p.price is not None and p.price > 0]
+    # Filter out products without ratings or with ratings <= 3.5
+    rated_products = [
+        p for p in relevant_products 
+        if p.rating is not None and p.rating > 3.5
+    ]
+    
+    if not rated_products:
+        # If no products meet the rating criteria, return empty list
+        logging.getLogger(__name__).warning(
+            "No products with rating > 3.5 found for query: %s", search_query
+        )
+        return []
+    
+    # Calculate price statistics to filter outliers
+    prices = [p.price for p in rated_products if p.price is not None and p.price > 0]
     if not prices:
-        return relevant_products
+        return rated_products
 
-    min_price = min(prices)
+    # Calculate median and interquartile range to identify reasonable prices
+    sorted_prices = sorted(prices)
+    n = len(sorted_prices)
+    median_price = sorted_prices[n // 2] if n % 2 == 1 else (sorted_prices[n // 2 - 1] + sorted_prices[n // 2]) / 2
+    
+    # Calculate Q1 and Q3 for IQR
+    q1_index = n // 4
+    q3_index = 3 * n // 4
+    q1 = sorted_prices[q1_index]
+    q3 = sorted_prices[q3_index]
+    iqr = q3 - q1
+    
+    # Define reasonable price range (exclude extreme outliers)
+    # Use 1.5 * IQR method (standard outlier detection)
+    lower_bound = max(0, q1 - 1.5 * iqr)
+    upper_bound = q3 + 1.5 * iqr
+    
+    # Filter products with relatable prices (within reasonable range)
+    relatable_products = [
+        p for p in rated_products
+        if p.price is not None and p.price > 0 and lower_bound <= p.price <= upper_bound
+    ]
+    
+    if not relatable_products:
+        # If filtering removed all products, use all rated products
+        logging.getLogger(__name__).info(
+            "No products within price range [%.2f, %.2f], using all rated products", 
+            lower_bound, upper_bound
+        )
+        relatable_products = rated_products
+    
+    # Calculate scores for relatable products
+    min_price = min(p.price for p in relatable_products if p.price is not None and p.price > 0)
 
-    for p in products:
+    for p in relatable_products:
         price_score = (min_price / p.price) if p.price and p.price > 0 else 0
         rating_score = (p.rating / 5.0) if p.rating else 0
         p.final_score = round((price_score * 0.7) + (rating_score * 0.3), 4)
@@ -141,7 +192,7 @@ def _calculate_recommendation(products: List[Product], search_query: str) -> Lis
         else:
             p.recommendation = "Consider Waiting"
 
-    return sorted(products, key=lambda x: x.final_score or 0, reverse=True)
+    return sorted(relatable_products, key=lambda x: x.final_score or 0, reverse=True)
 
 
 async def _scrape_amazon(query: str, crawler: AsyncWebCrawler) -> List[Product]:

@@ -155,7 +155,9 @@ def get_retailer_from_link(link) -> str:
 
 def calculate_recommendation_score(product: Product, all_products: List[Product]) -> Product:
     """
-    Calculate recommendation score based on multiple factors:
+    Calculate recommendation score based on multiple factors with quality filtering:
+    - Only considers products with rating > 3.5 for best deal recommendations
+    - Uses IQR-based outlier detection to filter extreme prices
     - Price (70% weight): Lower price = better score
     - Rating (30% weight): Higher rating = better score
     
@@ -166,12 +168,46 @@ def calculate_recommendation_score(product: Product, all_products: List[Product]
         product.recommendation = "Unable to compare"
         return product
     
-    # Get all valid prices for comparison across ALL products
-    valid_prices = [p.price for p in all_products if p.price and p.price > 0]
+    # Filter products with valid ratings > 3.5 for quality assurance
+    rated_products = [p for p in all_products if p.rating is not None and p.rating > 3.5 and p.price and p.price > 0]
+    
+    # If no products meet quality threshold, fall back to all products with valid prices
+    if not rated_products:
+        logger.warning("No products with rating > 3.5 found, using all products for scoring")
+        rated_products = [p for p in all_products if p.price and p.price > 0]
+    
+    if not rated_products:
+        product.final_score = 0.0
+        product.recommendation = "Price not available"
+        return product
+    
+    # Get all valid prices from quality products
+    valid_prices = sorted([p.price for p in rated_products])
+    
     if not valid_prices:
         product.final_score = 0.0
         product.recommendation = "Price not available"
         return product
+    
+    # Calculate IQR for outlier detection (only if we have enough data points)
+    if len(valid_prices) >= 4:
+        n = len(valid_prices)
+        q1 = valid_prices[n // 4]
+        q3 = valid_prices[3 * n // 4]
+        iqr = q3 - q1
+        
+        # Define acceptable price range (standard IQR method: Q1 - 1.5*IQR to Q3 + 1.5*IQR)
+        lower_bound = max(0, q1 - 1.5 * iqr)
+        upper_bound = q3 + 1.5 * iqr
+        
+        # Filter out price outliers
+        relatable_prices = [p for p in valid_prices if lower_bound <= p <= upper_bound]
+        
+        # If filtering removes all prices, use original valid_prices
+        if relatable_prices:
+            valid_prices = relatable_prices
+        else:
+            logger.warning("IQR filtering removed all prices, using all valid prices")
     
     min_price = min(valid_prices)
     max_price = max(valid_prices)
@@ -189,22 +225,39 @@ def calculate_recommendation_score(product: Product, all_products: List[Product]
     
     # Rating score (30% weight) - higher rating is better
     # Normalized to 0-1 scale (rating out of 5)
-    # If no rating, assume average (0.5)
-    rating_score = (product.rating / 5.0) if product.rating else 0.5
+    # Products without ratings or with low ratings get penalized
+    if product.rating is not None and product.rating > 3.5:
+        rating_score = product.rating / 5.0
+    elif product.rating is not None:
+        # Low rating (≤ 3.5) gets reduced score
+        rating_score = (product.rating / 5.0) * 0.5  # 50% penalty for low ratings
+    else:
+        # No rating gets minimal score
+        rating_score = 0.3
     
     # Final score calculation (weighted average)
     # 70% price importance, 30% rating importance
     product.final_score = round((price_score * 0.7) + (rating_score * 0.3), 4)
     
-    # Recommendation based on final score
-    if product.final_score >= 0.8:
-        product.recommendation = "Excellent Deal! Buy Now"
-    elif product.final_score >= 0.6:
-        product.recommendation = "Good Deal"
-    elif product.final_score >= 0.4:
-        product.recommendation = "Fair Price"
+    # Recommendation based on final score and rating quality
+    if product.rating is None or product.rating <= 3.5:
+        # Products without good ratings get cautious recommendations
+        if product.final_score >= 0.7:
+            product.recommendation = "Good Price (Verify Quality)"
+        elif product.final_score >= 0.5:
+            product.recommendation = "Fair Price (Check Reviews)"
+        else:
+            product.recommendation = "Consider Alternatives"
     else:
-        product.recommendation = "Consider Waiting"
+        # Products with good ratings (> 3.5) get confident recommendations
+        if product.final_score >= 0.8:
+            product.recommendation = "Excellent Deal! Buy Now"
+        elif product.final_score >= 0.6:
+            product.recommendation = "Good Deal"
+        elif product.final_score >= 0.4:
+            product.recommendation = "Fair Price"
+        else:
+            product.recommendation = "Consider Waiting"
     
     logger.debug(f"Product: {product.product_name[:50]} | Price: ₹{product.price} | Rating: {product.rating} | Score: {product.final_score}")
     
@@ -413,7 +466,13 @@ async def search_google_shopping(query: str, location: str = "India", limit: int
                     logger.error(f"Error processing additional product: {e}")
                     continue
         
-        all_products = all_products[:limit]  # Ensure we don't exceed limit
+        # Limit to top 12 products FIRST (before any filtering or scoring)
+        # This ensures we display exactly these 12 products in the frontend
+        if len(all_products) > 12:
+            logger.info(f"Limiting from {len(all_products)} products to top 12 for display")
+            all_products = all_products[:12]
+        
+        logger.info(f"Working with {len(all_products)} products for display and best deal selection")
         
         # Ensure we have at least some Amazon and Flipkart products if available
         if not amazon_products or not flipkart_products:
@@ -423,21 +482,18 @@ async def search_google_shopping(query: str, location: str = "India", limit: int
             logger.warning(f"No valid products found for query: {query}")
             return SearchResponse(platforms=[], price_low=None, price_avg=None, price_high=None)
         
-        # Group by retailer
+        # Calculate recommendation scores for these 12 products
+        for product in all_products:
+            calculate_recommendation_score(product, all_products)
+        
+        logger.info(f"Calculated recommendation scores for {len(all_products)} products (keeping original order)")
+        
+        # Group by retailer (products stay in original API order)
         platform_groups = {}
         for product in all_products:
             if product.retailer not in platform_groups:
                 platform_groups[product.retailer] = []
             platform_groups[product.retailer].append(product)
-        
-        # Calculate recommendation scores for all products
-        for product in all_products:
-            calculate_recommendation_score(product, all_products)
-        
-        # Sort by final score (best deals first)
-        all_products.sort(key=lambda x: x.final_score or 0, reverse=True)
-        
-        logger.info(f"Sorted {len(all_products)} products by recommendation score")
         
         # Create platform products
         platform_products = []
@@ -469,7 +525,8 @@ async def search_google_shopping(query: str, location: str = "India", limit: int
         overall_price_avg = sum(all_prices) / len(all_prices) if all_prices else None
         overall_price_high = max(all_prices) if all_prices else None
         
-        # Generate AI recommendation
+        # Generate AI recommendation from the 12 products
+        logger.info(f"Generating AI recommendation from {len(all_products)} products (all will be displayed in frontend)")
         ai_recommendation = generate_ai_recommendation(all_products, query)
         
         response = SearchResponse(
@@ -488,12 +545,26 @@ async def search_google_shopping(query: str, location: str = "India", limit: int
         raise ValueError(f"Search failed: {str(e)}")
 
 def generate_ai_recommendation(products: List[Product], query: str) -> str:
-    """Generate AI recommendation based on products"""
+    """Generate AI recommendation based on products with quality filtering"""
     if not products:
         return "No products found for your search."
     
-    # Find best deal
-    best_product = max(products, key=lambda x: x.final_score or 0)
+    logger.info(f"Selecting best deal from {len(products)} products")
+    
+    # Find best deal - prioritize products with rating > 3.5
+    quality_products = [p for p in products if p.rating is not None and p.rating > 3.5]
+    
+    if quality_products:
+        # Best deal from quality products
+        best_product = max(quality_products, key=lambda x: x.final_score or 0)
+        product_name_preview = best_product.product_name[:50] if len(best_product.product_name) > 50 else best_product.product_name
+        logger.info(f"Best deal selected from {len(quality_products)} quality products: {product_name_preview}... (₹{best_product.price}, Rating: {best_product.rating}, Score: {best_product.final_score:.2f})")
+    else:
+        # Fallback to all products if no quality products available
+        logger.warning("No products with rating > 3.5 found for best deal recommendation")
+        best_product = max(products, key=lambda x: x.final_score or 0)
+        product_name_preview = best_product.product_name[:50] if len(best_product.product_name) > 50 else best_product.product_name
+        logger.info(f"Best deal selected from all products: {product_name_preview}... (₹{best_product.price}, Rating: {best_product.rating or 'N/A'}, Score: {best_product.final_score:.2f})")
     
     # Count platforms
     platforms = set(p.retailer for p in products if p.retailer)

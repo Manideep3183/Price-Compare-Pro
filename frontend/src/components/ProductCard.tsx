@@ -1,4 +1,5 @@
 import { Product } from '@/types/product';
+import { trackActivity } from '@/lib/api';
 
 // Base URLs for Amazon and Flipkart
 export const AMAZON_BASE_URL = "https://www.amazon.in/";
@@ -27,12 +28,40 @@ const getRecommendationColor = (recommendation: string): string => {
 };
 
 export const ProductCard = ({ product, highlighted, hideRecommendationBadge = false }: ProductCardProps) => {
+  
+  const handleProductClick = () => {
+    // Track when user clicks on a product card
+    trackActivity('clicked_product', {
+      product_name: product.product_name,
+      retailer: product.retailer,
+      price: product.price,
+      rating: product.rating,
+      recommendation: product.recommendation,
+      is_best_deal: highlighted || false,
+    });
+  };
+
+  const handleRetailerLinkClick = (e: React.MouseEvent) => {
+    // Track when user clicks "View on Retailer" button
+    trackActivity('clicked_retailer_link', {
+      product_name: product.product_name,
+      retailer: product.retailer,
+      price: product.price,
+      product_url: product.product_url,
+      is_best_deal: highlighted || false,
+    });
+  };
+
   return (
-    <Card className={`overflow-hidden transition-all duration-500 hover:shadow-glow group animate-scale-in relative ${
-      highlighted
-        ? 'border-4 border-fuchsia-400 shadow-2xl shadow-fuchsia-400/50 scale-105 ring-4 ring-pink-300/30 bg-gradient-to-br from-fuchsia-50 via-pink-50 to-rose-50 dark:from-fuchsia-950/30 dark:via-pink-950/30 dark:to-rose-950/30'
-        : 'glass-effect border-primary/20'
-    }`} style={{ maxWidth: '300px', minWidth: '260px' }}>
+    <Card 
+      className={`overflow-hidden transition-all duration-500 hover:shadow-glow group animate-scale-in relative ${
+        highlighted
+          ? 'border-4 border-fuchsia-400 shadow-2xl shadow-fuchsia-400/50 scale-105 ring-4 ring-pink-300/30 bg-gradient-to-br from-fuchsia-50 via-pink-50 to-rose-50 dark:from-fuchsia-950/30 dark:via-pink-950/30 dark:to-rose-950/30'
+          : 'glass-effect border-primary/20'
+      }`} 
+      style={{ maxWidth: '300px', minWidth: '260px' }}
+      onClick={handleProductClick}
+    >
       
       {/* Floating BEST DEAL Badge - Enhanced with Fuchsia/Pink theme */}
       {highlighted && (
@@ -113,6 +142,7 @@ export const ProductCard = ({ product, highlighted, hideRecommendationBadge = fa
             target="_blank" 
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2"
+            onClick={handleRetailerLinkClick}
           >
             View on {product.retailer}
             <ExternalLink className="h-4 w-4" />

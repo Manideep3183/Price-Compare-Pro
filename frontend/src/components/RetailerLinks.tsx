@@ -14,49 +14,49 @@ interface Retailer {
 const retailers: Retailer[] = [
   {
     name: 'Amazon',
-    logo: 'https://cdn.worldvectorlogo.com/logos/amazon-icon-1.svg',
+    logo: '/logos/amazon.png',
     searchUrl: 'https://www.amazon.in/s?k=',
     primaryColor: 'from-orange-500 to-yellow-500'
   },
   {
     name: 'Flipkart',
-    logo: 'https://static-assets-web.flixcart.com/batman-returns/batman-returns/p/images/fkheaderlogo_exploreplus-44005d.svg',
+    logo: '/logos/flipkart.png',
     searchUrl: 'https://www.flipkart.com/search?q=',
     primaryColor: 'from-blue-500 to-indigo-500'
   },
   {
     name: 'Croma',
-    logo: 'https://www.croma.com/assets/logo/logo.svg',
+    logo: '/logos/croma.png',
     searchUrl: 'https://www.croma.com/searchB?q=',
     primaryColor: 'from-green-500 to-emerald-500'
   },
   {
     name: 'JioMart',
-    logo: 'https://www.jiomart.com/images/jiomart-logo.svg',
+    logo: '/logos/jiomart.png',
     searchUrl: 'https://www.jiomart.com/search/',
     primaryColor: 'from-blue-600 to-purple-600'
   },
   {
     name: 'Tata CLiQ',
-    logo: 'https://www.tatacliq.com/src/general/components/img/logo.svg',
+    logo: '/logos/tatacliq.png',
     searchUrl: 'https://www.tatacliq.com/search/?searchCategory=all&text=',
     primaryColor: 'from-indigo-500 to-blue-500'
   },
   {
     name: 'Reliance Digital',
-    logo: 'https://www.reliancedigital.in/build/client/images/loaders/rd_logo.svg',
+    logo: '/logos/reliance.png',
     searchUrl: 'https://www.reliancedigital.in/products?q=',
     primaryColor: 'from-purple-500 to-pink-500'
   },
   {
     name: 'Myntra',
-    logo: 'https://constant.myntassets.com/web/assets/img/icon.e8734479.png',
+    logo: '/logos/myntra.png',
     searchUrl: 'https://www.myntra.com/search/',
     primaryColor: 'from-pink-500 to-red-500'
   },
   {
     name: 'Nykaa',
-    logo: 'https://www.nykaa.com/assets/desktop/images/nykaa-logo.svg',
+    logo: '/logos/nykaa.png',
     searchUrl: 'https://www.nykaa.com/search/result/?q=',
     primaryColor: 'from-pink-400 to-rose-400'
   }
@@ -110,11 +110,11 @@ export const RetailerLinks = ({ searchQuery }: RetailerLinksProps) => {
             
             {/* Content */}
             <div className="relative z-10 flex flex-col items-center gap-2">
-              <div className="w-12 h-12 flex items-center justify-center bg-white rounded-lg p-1.5 shadow-md">
+              <div className="w-12 h-12 flex items-center justify-center bg-white rounded-lg overflow-hidden shadow-md">
                 <img 
                   src={retailer.logo} 
                   alt={`${retailer.name} logo`}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-cover"
                   onError={(e) => {
                     // Fallback to text if image fails to load
                     const target = e.target as HTMLImageElement;

@@ -1,22 +1,101 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { SearchForm } from '@/components/SearchForm';
 import { ResultsDisplay } from '@/components/ResultsDisplay';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { FeaturedCarousel } from '@/components/FeaturedCarousel';
 import { FloatingParticles } from '@/components/FloatingParticles';
+import { UserProfileDropdown } from '@/components/UserProfileDropdown';
 import { Product } from '@/types/product';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { TrendingUp, Zap, Shield } from 'lucide-react';
 import { Mail, Linkedin } from 'lucide-react';
+import { saveSearch, checkUserExists, createOrUpdateUserProfile } from '@/lib/api';
 
 
 const Index = () => {
-  const [products, setProducts] = useState<{ amazon?: Product[]; flipkart?: Product[] }>({ amazon: [], flipkart: [] });
+  const [products, setProducts] = useState<{ amazon?: Product[]; flipkart?: Product[] }>(() => {
+    // Load from sessionStorage on mount
+    const saved = sessionStorage.getItem('searchResults_products');
+    return saved ? JSON.parse(saved) : { amazon: [], flipkart: [] };
+  });
   const [isLoading, setIsLoading] = useState(false);
-  const [priceStats, setPriceStats] = useState<{low?: number, avg?: number, high?: number}>({});
-  const [aiRecommendation, setAiRecommendation] = useState<string | null>(null);
+  const [priceStats, setPriceStats] = useState<{low?: number, avg?: number, high?: number}>(() => {
+    // Load from sessionStorage on mount
+    const saved = sessionStorage.getItem('searchResults_priceStats');
+    return saved ? JSON.parse(saved) : {};
+  });
+  const [aiRecommendation, setAiRecommendation] = useState<string | null>(() => {
+    // Load from sessionStorage on mount
+    const saved = sessionStorage.getItem('searchResults_aiRecommendation');
+    return saved || null;
+  });
   const { toast } = useToast();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  // Persist search results to sessionStorage
+  useEffect(() => {
+    sessionStorage.setItem('searchResults_products', JSON.stringify(products));
+  }, [products]);
+
+  useEffect(() => {
+    sessionStorage.setItem('searchResults_priceStats', JSON.stringify(priceStats));
+  }, [priceStats]);
+
+  useEffect(() => {
+    if (aiRecommendation) {
+      sessionStorage.setItem('searchResults_aiRecommendation', aiRecommendation);
+    }
+  }, [aiRecommendation]);
+
+  // Check if user still exists in database on page load
+  useEffect(() => {
+    const verifyUserExists = async () => {
+      if (user) {
+        try {
+          const exists = await checkUserExists();
+          if (!exists) {
+            console.log('⚠️ User no longer exists in database, logging out...');
+            toast({
+              title: "Account Deleted",
+              description: "Your account has been deleted. Please sign up again.",
+              variant: "destructive",
+            });
+            await logout();
+            navigate('/login');
+          }
+        } catch (error) {
+          console.error('Failed to verify user existence:', error);
+        }
+      }
+    };
+
+    verifyUserExists();
+  }, [user, logout, navigate, toast]);
+
+  // Ensure user profile exists in MongoDB (safety check for Google auth users)
+  useEffect(() => {
+    const ensureUserProfile = async () => {
+      if (user) {
+        try {
+          // Try to create/update profile - this is idempotent
+          // If user was deleted and signed up again with Google, this recreates the profile
+          await createOrUpdateUserProfile({
+            auth_provider: user.providerData?.[0]?.providerId === 'google.com' ? 'google' : 'email',
+          });
+          console.log('✅ User profile ensured in MongoDB');
+        } catch (error) {
+          console.error('⚠️ Failed to ensure user profile:', error);
+          // Non-critical error, don't block the user
+        }
+      }
+    };
+
+    ensureUserProfile();
+  }, [user]);
 
   const handleSearch = async (query: string) => {
   setIsLoading(true);
@@ -25,7 +104,8 @@ const Index = () => {
   setAiRecommendation(null);
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/v1/search', {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      const response = await axios.post(`${apiUrl}/api/v1/search`, {
         query,
         location: "India",
         limit: 12  // Get top 12 products
@@ -48,6 +128,23 @@ const Index = () => {
 
       const totalCount = response.data.platforms?.reduce((acc: number, platform: any) => 
         acc + (platform.products?.length || 0), 0) || 0;
+      
+      // Save search to backend
+      try {
+        console.log('Attempting to save search:', query, totalCount);
+        await saveSearch(query, totalCount);
+        console.log('Search saved successfully!');
+      } catch (searchError) {
+        console.error('Failed to save search:', searchError);
+        // Show more details about the error
+        if (axios.isAxiosError(searchError)) {
+          console.error('Error details:', {
+            status: searchError.response?.status,
+            data: searchError.response?.data,
+            message: searchError.message
+          });
+        }
+      }
       
       toast({
         title: 'Search Complete!',
@@ -73,7 +170,7 @@ const Index = () => {
       <FloatingParticles />
 
       {/* Theme Toggle - Floating Button */}
-      <div className="fixed top-4 right-4 z-50 animate-fade-in">
+      <div className="fixed top-4 right-4 z-50 animate-fade-in flex items-center gap-3">
         <ThemeToggle />
       </div>
 
@@ -82,15 +179,18 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-gradient-primary flex items-center justify-center transition-all duration-300 hover:scale-110 hover:rotate-12 animate-pulse-glow shadow-glow">
-                <TrendingUp className="h-6 w-6 text-primary-foreground" />
+              <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:rotate-12 animate-pulse-glow shadow-glow">
+                <TrendingUp className="h-7 w-7 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent glow-text">
-                  PriceCompare Pro
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent glow-text">
+                  SmartCart
                 </h1>
                 <p className="text-xs text-muted-foreground">AI-Powered Price Comparison</p>
               </div>
+            </div>
+            <div className="animate-fade-in">
+              <UserProfileDropdown />
             </div>
           </div>
         </div>
@@ -100,25 +200,25 @@ const Index = () => {
       <section className="py-12 px-4 animate-fade-in relative z-10">
         <div className="container mx-auto max-w-4xl text-center space-y-6">
           <h2 className="text-4xl md:text-5xl font-bold animate-fade-in-up">
-            Find the <span className="bg-gradient-primary bg-clip-text text-transparent glow-text animate-gradient-shift bg-[length:200%_200%]">Best Deals</span> in Seconds
+            Find the <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent glow-text animate-gradient-shift bg-[length:200%_200%]">Best Deals</span> in Seconds
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            Compare prices across Amazon, Flipkart, Croma and more in India. 
+            <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent font-semibold">Compare prices</span> across Amazon, Flipkart, Croma and more in India. 
             Get the best deals with accurate INR pricing from trusted retailers.
           </p>
 
           <div className="flex flex-wrap justify-center gap-6 pt-4 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
             <div className="flex items-center gap-2 transition-all duration-300 hover:scale-110 hover:shadow-glow px-4 py-2 rounded-full glass-effect">
-              <Zap className="h-5 w-5 text-primary animate-pulse-glow" />
-              <span className="text-sm font-medium">Real-time Prices</span>
+              <Zap className="h-5 w-5 text-purple-600 dark:text-purple-400 animate-pulse-glow" />
+              <span className="text-sm font-medium bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">Real-time Prices</span>
             </div>
             <div className="flex items-center gap-2 transition-all duration-300 hover:scale-110 hover:shadow-glow px-4 py-2 rounded-full glass-effect">
-              <Shield className="h-5 w-5 text-accent animate-pulse-glow" />
-              <span className="text-sm font-medium">AI Recommendations</span>
+              <Shield className="h-5 w-5 text-pink-600 dark:text-pink-400 animate-pulse-glow" />
+              <span className="text-sm font-medium bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">AI Recommendations</span>
             </div>
             <div className="flex items-center gap-2 transition-all duration-300 hover:scale-110 hover:shadow-glow px-4 py-2 rounded-full glass-effect">
-              <TrendingUp className="h-5 w-5 text-primary animate-pulse-glow" />
-              <span className="text-sm font-medium">Best Value Score</span>
+              <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400 animate-pulse-glow" />
+              <span className="text-sm font-medium bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">Best Value Score</span>
             </div>
           </div>
         </div>
@@ -128,7 +228,7 @@ const Index = () => {
       <section className="px-4 pb-12 relative z-10">
         <div className="container mx-auto">
           <h3 className="text-2xl font-bold text-center mb-6 animate-fade-in-up">
-            <span className="bg-gradient-primary bg-clip-text text-transparent">Key Features</span>
+            <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">Key Features</span>
           </h3>
           <FeaturedCarousel />
         </div>
@@ -157,11 +257,11 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t glass-effect py-10 mt-auto relative z-10 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md">
         <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 text-sm text-neutral-700 dark:text-neutral-300 animate-fade-in-up">
-          {/* PriceComparePro - Column 1 */}
+          {/* SmartCart - Column 1 */}
           <div className="text-left">
-            <h4 className="font-bold text-base mb-2 text-neutral-900 dark:text-neutral-100">PriceComparePro</h4>
+            <h4 className="font-bold text-base mb-2 text-neutral-900 dark:text-neutral-100">SmartCart</h4>
             <p className="text-neutral-800 dark:text-neutral-100 font-medium text-sm mb-2">A modern price comparison application for everyone.</p>
-            <p className="text-neutral-600 dark:text-neutral-300">© 2025 PriceComparePro. All rights reserved.</p>
+            <p className="text-neutral-600 dark:text-neutral-300">© 2025 SmartCart. All rights reserved.</p>
           </div>
 
           {/* Developers - Column 2 */}
