@@ -7,7 +7,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # MongoDB connection
-MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017/SmartCart")
+# Support both MONGODB_URI (standard/Vercel) and MONGO_URL (legacy)
+MONGO_URL = os.getenv("MONGODB_URI") or os.getenv("MONGO_URL", "mongodb://localhost:27017/SmartCart")
 DATABASE_NAME = "SmartCart"
 
 # Global client and database

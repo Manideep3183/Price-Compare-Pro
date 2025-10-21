@@ -14,9 +14,10 @@ load_dotenv(dotenv_path=env_path)
 logger = logging.getLogger(__name__)
 
 # Get SerpAPI key from environment
-SERPAPI_KEY = os.getenv('SERPAPI_KEY')
+# Support both SERPAPI_API_KEY (standard/Vercel) and SERPAPI_KEY (legacy)
+SERPAPI_KEY = os.getenv('SERPAPI_API_KEY') or os.getenv('SERPAPI_KEY')
 if not SERPAPI_KEY:
-    logger.warning('SERPAPI_KEY not set in .env file')
+    logger.warning('SERPAPI_API_KEY or SERPAPI_KEY not set in .env file')
 
 class Product(BaseModel):
     product_name: str
