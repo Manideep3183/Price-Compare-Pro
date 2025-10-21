@@ -27,17 +27,30 @@ export const Login = () => {
     try {
       await login(email, password);
       
-      // Create/update user profile in MongoDB (handles both new and existing users)
+      // Check if user exists in MongoDB
       try {
-        await createOrUpdateUserProfile({
-          auth_provider: 'email',
-        });
-        console.log('✅ User profile saved/updated in MongoDB');
+        const { checkUserExists } = await import('@/lib/api');
+        const userExists = await checkUserExists();
         
+        if (!userExists) {
+          // No account found in MongoDB - this shouldn't happen for email users
+          // but handle it gracefully by creating the profile
+          console.warn('⚠️ Email user authenticated but no MongoDB profile found. Creating profile...');
+          await createOrUpdateUserProfile({
+            auth_provider: 'email',
+          });
+        } else {
+          // User exists - just update last login
+          await createOrUpdateUserProfile({
+            auth_provider: 'email',
+          });
+        }
+        
+        console.log('✅ User logged in successfully');
         navigate('/');
       } catch (profileError) {
-        console.error('⚠️ Failed to save profile:', profileError);
-        // Still allow login even if profile save fails
+        console.error('⚠️ Failed to verify/update profile:', profileError);
+        // Still allow login even if profile check/update fails
         navigate('/');
       }
     } catch (err: any) {
@@ -54,16 +67,31 @@ export const Login = () => {
     try {
       await loginWithGoogle();
       
-      // Always create/update user profile for Google login (handles both new and existing users)
+      // Check if user exists in MongoDB
       try {
+        const { checkUserExists } = await import('@/lib/api');
+        const userExists = await checkUserExists();
+        
+        if (!userExists) {
+          // No account found - redirect to signup
+          setError('No account found. Please sign up first.');
+          
+          // Sign out the user
+          const { auth } = await import('@/lib/firebase');
+          await auth.signOut();
+          setLoading(false);
+          return;
+        }
+        
+        // User exists - update profile and login
         await createOrUpdateUserProfile({
           auth_provider: 'google',
         });
-        console.log('✅ Google user profile saved/updated in MongoDB');
+        console.log('✅ Google user logged in successfully');
         
         navigate('/');
       } catch (profileError) {
-        console.error('⚠️ Failed to save profile:', profileError);
+        console.error('⚠️ Failed to verify/update profile:', profileError);
         setError('Failed to complete sign-in. Please try again.');
         
         // Sign out the user on error

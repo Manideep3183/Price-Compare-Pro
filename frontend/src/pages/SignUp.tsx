@@ -79,41 +79,31 @@ export const SignUp = () => {
     try {
       await loginWithGoogle();
       
-      // Check if user exists in MongoDB (might have been deleted)
+      // Check if user already exists in MongoDB
       try {
         const { checkUserExists } = await import('@/lib/api');
         const userExists = await checkUserExists();
         
-        if (!userExists) {
-          // User was deleted from MongoDB
-          const isResignupAttempt = localStorage.getItem('google_resignup_attempt');
+        if (userExists) {
+          // User already has an account
+          setError('Account already exists. Please use the Login page instead.');
           
-          if (!isResignupAttempt) {
-            // First attempt after deletion - show error and set flag
-            localStorage.setItem('google_resignup_attempt', 'true');
-            setError('Your account was deleted. Please click "Continue with Google" again to re-create your account.');
-            
-            // Sign out the user
-            const { auth } = await import('@/lib/firebase');
-            await auth.signOut();
-            setLoading(false);
-            return;
-          } else {
-            // Second attempt - create the account
-            console.log('🔄 Re-creating Google account after deletion...');
-            localStorage.removeItem('google_resignup_attempt');
-          }
+          // Sign out the user
+          const { auth } = await import('@/lib/firebase');
+          await auth.signOut();
+          setLoading(false);
+          return;
         }
         
-        // Save user profile to MongoDB (Google auth)
+        // Create new user profile in MongoDB (Google auth)
         await createOrUpdateUserProfile({
           auth_provider: 'google',
         });
-        console.log('✅ Google user profile saved to MongoDB');
+        console.log('✅ New Google user profile created in MongoDB');
         
         navigate('/');
       } catch (profileError) {
-        console.error('⚠️ Failed to check/save profile:', profileError);
+        console.error('⚠️ Failed to check/create profile:', profileError);
         setError('Failed to complete sign-up. Please try again.');
         
         // Sign out the user on error
