@@ -27,26 +27,17 @@ export const Login = () => {
     try {
       await login(email, password);
       
-      // Check if user exists in MongoDB (might have been deleted)
+      // Create/update user profile in MongoDB (handles both new and existing users)
       try {
-        const { checkUserExists } = await import('@/lib/api');
-        const userExists = await checkUserExists();
-        
-        if (!userExists) {
-          // User was deleted from MongoDB
-          setError('Your account was deleted. Please sign up again to continue.');
-          
-          // Sign out the user
-          const { auth } = await import('@/lib/firebase');
-          await auth.signOut();
-          setLoading(false);
-          return;
-        }
+        await createOrUpdateUserProfile({
+          auth_provider: 'email',
+        });
+        console.log('✅ User profile saved/updated in MongoDB');
         
         navigate('/');
-      } catch (checkError) {
-        console.error('⚠️ Failed to check user existence:', checkError);
-        // If check fails, still allow login but log the error
+      } catch (profileError) {
+        console.error('⚠️ Failed to save profile:', profileError);
+        // Still allow login even if profile save fails
         navigate('/');
       }
     } catch (err: any) {
@@ -63,33 +54,8 @@ export const Login = () => {
     try {
       await loginWithGoogle();
       
-      // Check if user exists in MongoDB (might have been deleted)
+      // Always create/update user profile for Google login (handles both new and existing users)
       try {
-        const { checkUserExists } = await import('@/lib/api');
-        const userExists = await checkUserExists();
-        
-        if (!userExists) {
-          // User was deleted from MongoDB
-          const isResignupAttempt = localStorage.getItem('google_resignup_attempt');
-          
-          if (!isResignupAttempt) {
-            // First attempt after deletion - show error and set flag
-            localStorage.setItem('google_resignup_attempt', 'true');
-            setError('Your account was deleted. Please click "Continue with Google" again to re-create your account.');
-            
-            // Sign out the user
-            const { auth } = await import('@/lib/firebase');
-            await auth.signOut();
-            setLoading(false);
-            return;
-          } else {
-            // Second attempt - create the account
-            console.log('🔄 Re-creating Google account after deletion...');
-            localStorage.removeItem('google_resignup_attempt');
-          }
-        }
-        
-        // Save/update user profile to MongoDB (Google auth)
         await createOrUpdateUserProfile({
           auth_provider: 'google',
         });
@@ -97,7 +63,7 @@ export const Login = () => {
         
         navigate('/');
       } catch (profileError) {
-        console.error('⚠️ Failed to check/save profile:', profileError);
+        console.error('⚠️ Failed to save profile:', profileError);
         setError('Failed to complete sign-in. Please try again.');
         
         // Sign out the user on error
