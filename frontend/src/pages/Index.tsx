@@ -78,7 +78,7 @@ const Index = () => {
   setAiRecommendation(null);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'https://price-compare-pro-1.onrender.com';
       const response = await axios.post(`${apiUrl}/api/v1/search`, {
         query,
         location: "India",
