@@ -143,81 +143,80 @@ const Index = () => {
       {/* Floating Particles Background */}
       <FloatingParticles />
 
-      {/* Theme Toggle - Floating Button */}
-      <div className="fixed top-4 right-4 z-50 animate-fade-in flex items-center gap-3">
-        <ThemeToggle />
-      </div>
-
-      {/* Header */}
+      {/* Header - Non-fixed, scrolls with page */}
       <header className="border-b glass-effect sticky top-0 z-40 shadow-glow transition-all duration-300 animate-slide-in-right">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:rotate-12 animate-pulse-glow shadow-glow">
-                <TrendingUp className="h-7 w-7 text-white" />
+        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-2 sm:gap-4">
+            {/* Logo Section - Responsive */}
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:rotate-12 animate-pulse-glow shadow-glow">
+                <TrendingUp className="h-5 w-5 sm:h-7 sm:w-7 text-white" />
               </div>
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent glow-text">
+              <div className="hidden xs:block">
+                <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent glow-text">
                   SmartCart
                 </h1>
-                <p className="text-xs text-muted-foreground">AI-Powered Price Comparison</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">AI-Powered Price Comparison</p>
               </div>
             </div>
-            <div className="animate-fade-in">
+
+            {/* Right Section - Theme Toggle + Profile */}
+            <div className="flex items-center gap-2 sm:gap-3 animate-fade-in">
+              <ThemeToggle />
               <UserProfileDropdown />
             </div>
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="py-12 px-4 animate-fade-in relative z-10">
-        <div className="container mx-auto max-w-4xl text-center space-y-6">
-          <h2 className="text-4xl md:text-5xl font-bold animate-fade-in-up">
+      {/* Hero Section - Responsive */}
+      <section className="py-8 sm:py-12 px-3 sm:px-4 animate-fade-in relative z-10">
+        <div className="container mx-auto max-w-4xl text-center space-y-4 sm:space-y-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold animate-fade-in-up px-2">
             Find the <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent glow-text animate-gradient-shift bg-[length:200%_200%]">Best Deals</span> in Seconds
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto animate-fade-in-up px-4" style={{ animationDelay: '0.1s' }}>
             <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent font-semibold">Compare prices</span> across Amazon, Flipkart, Croma and more in India. 
             Get the best deals with accurate INR pricing from trusted retailers.
           </p>
 
-          <div className="flex flex-wrap justify-center gap-6 pt-4 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            <div className="flex items-center gap-2 transition-all duration-300 hover:scale-110 hover:shadow-glow px-4 py-2 rounded-full glass-effect">
-              <Zap className="h-5 w-5 text-purple-600 dark:text-purple-400 animate-pulse-glow" />
-              <span className="text-sm font-medium bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">Real-time Prices</span>
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-6 pt-2 sm:pt-4 animate-fade-in-up px-2" style={{ animationDelay: '0.2s' }}>
+            <div className="flex items-center gap-1.5 sm:gap-2 transition-all duration-300 hover:scale-110 hover:shadow-glow px-3 sm:px-4 py-1.5 sm:py-2 rounded-full glass-effect">
+              <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-400 animate-pulse-glow" />
+              <span className="text-xs sm:text-sm font-medium bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">Real-time Prices</span>
             </div>
-            <div className="flex items-center gap-2 transition-all duration-300 hover:scale-110 hover:shadow-glow px-4 py-2 rounded-full glass-effect">
-              <Shield className="h-5 w-5 text-pink-600 dark:text-pink-400 animate-pulse-glow" />
-              <span className="text-sm font-medium bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">AI Recommendations</span>
+            <div className="flex items-center gap-1.5 sm:gap-2 transition-all duration-300 hover:scale-110 hover:shadow-glow px-3 sm:px-4 py-1.5 sm:py-2 rounded-full glass-effect">
+              <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-pink-600 dark:text-pink-400 animate-pulse-glow" />
+              <span className="text-xs sm:text-sm font-medium bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">AI Recommendations</span>
             </div>
-            <div className="flex items-center gap-2 transition-all duration-300 hover:scale-110 hover:shadow-glow px-4 py-2 rounded-full glass-effect">
-              <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400 animate-pulse-glow" />
-              <span className="text-sm font-medium bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">Best Value Score</span>
+            <div className="flex items-center gap-1.5 sm:gap-2 transition-all duration-300 hover:scale-110 hover:shadow-glow px-3 sm:px-4 py-1.5 sm:py-2 rounded-full glass-effect">
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400 animate-pulse-glow" />
+              <span className="text-xs sm:text-sm font-medium bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">Best Value Score</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Featured Carousel Section */}
-      <section className="px-4 pb-12 relative z-10">
+      {/* Featured Carousel Section - Responsive */}
+      <section className="px-3 sm:px-4 pb-8 sm:pb-12 relative z-10">
         <div className="container mx-auto">
-          <h3 className="text-2xl font-bold text-center mb-6 animate-fade-in-up">
+          <h3 className="text-xl sm:text-2xl font-bold text-center mb-4 sm:mb-6 animate-fade-in-up px-2">
             <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">Key Features</span>
           </h3>
           <FeaturedCarousel />
         </div>
       </section>
 
-      {/* Search Section */}
-      <section className="px-4 pb-8 relative z-10">
+      {/* Search Section - Responsive */}
+      <section className="px-3 sm:px-4 pb-6 sm:pb-8 relative z-10">
         <div className="container mx-auto">
           <SearchForm onSearch={handleSearch} isLoading={isLoading} />
         </div>
       </section>
 
 
-      {/* Results Section */}
-      <section className="px-4 pb-16 relative z-10">
+      {/* Results Section - Responsive */}
+      <section className="px-3 sm:px-4 pb-12 sm:pb-16 relative z-10">
         <div className="container mx-auto">
           <ResultsDisplay 
             products={products} 
@@ -228,39 +227,39 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t glass-effect py-10 mt-auto relative z-10 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md">
-        <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 text-sm text-neutral-700 dark:text-neutral-300 animate-fade-in-up">
+      {/* Footer - Responsive */}
+      <footer className="border-t glass-effect py-6 sm:py-10 mt-auto relative z-10 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md">
+        <div className="container mx-auto px-3 sm:px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 text-sm text-neutral-700 dark:text-neutral-300 animate-fade-in-up">
           {/* SmartCart - Column 1 */}
           <div className="text-left">
             <h4 className="font-bold text-base mb-2 text-neutral-900 dark:text-neutral-100">SmartCart</h4>
             <p className="text-neutral-800 dark:text-neutral-100 font-medium text-sm mb-2">A modern price comparison application for everyone.</p>
-            <p className="text-neutral-600 dark:text-neutral-300">© 2025 SmartCart. All rights reserved.</p>
+            <p className="text-neutral-600 dark:text-neutral-300 text-xs sm:text-sm">© 2025 SmartCart. All rights reserved.</p>
           </div>
 
           {/* Developers - Column 2 */}
           <div className="text-left">
             <h4 className="font-bold text-base mb-2 text-neutral-900 dark:text-neutral-100">Developers</h4>
-            <ul className="space-y-3">
+            <ul className="space-y-2 sm:space-y-3">
               <li className="flex items-center gap-2">
-                <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-green-500 to-blue-500 text-white font-bold text-lg shadow-glow">R</span>
-                <span className="font-medium text-neutral-900 dark:text-neutral-100">Rohan Pagadala</span>
+                <span className="inline-flex items-center justify-center h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-gradient-to-br from-green-500 to-blue-500 text-white font-bold text-base sm:text-lg shadow-glow">R</span>
+                <span className="font-medium text-neutral-900 dark:text-neutral-100 text-xs sm:text-sm">Rohan Pagadala</span>
                 <a href="https://in.linkedin.com/in/rohan-pagadala" target="_blank" rel="noopener noreferrer" className="ml-1 text-blue-500 dark:text-blue-400 hover:text-blue-400 dark:hover:text-blue-300 transition-colors" title="LinkedIn">
-                  <Linkedin className="h-5 w-5" />
+                  <Linkedin className="h-4 w-4 sm:h-5 sm:w-5" />
                 </a>
               </li>
               <li className="flex items-center gap-2">
-                <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-white font-bold text-lg shadow-glow">M</span>
-                <span className="font-medium text-neutral-900 dark:text-neutral-100">Manideep Reddy P</span>
+                <span className="inline-flex items-center justify-center h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-white font-bold text-base sm:text-lg shadow-glow">M</span>
+                <span className="font-medium text-neutral-900 dark:text-neutral-100 text-xs sm:text-sm">Manideep Reddy P</span>
                 <a href="https://www.linkedin.com/in/patlolla-manideep-reddy-31870827a/?originalSubdomain=in" target="_blank" rel="noopener noreferrer" className="ml-1 text-blue-500 dark:text-blue-400 hover:text-blue-400 dark:hover:text-blue-300 transition-colors" title="LinkedIn">
-                  <Linkedin className="h-5 w-5" />
+                  <Linkedin className="h-4 w-4 sm:h-5 sm:w-5" />
                 </a>
               </li>
               <li className="flex items-center gap-2">
-                <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 text-white font-bold text-lg shadow-glow">V</span>
-                <span className="font-medium text-neutral-900 dark:text-neutral-100">Vineeth V</span>
+                <span className="inline-flex items-center justify-center h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 text-white font-bold text-base sm:text-lg shadow-glow">V</span>
+                <span className="font-medium text-neutral-900 dark:text-neutral-100 text-xs sm:text-sm">Vineeth V</span>
                 <a href="https://www.linkedin.com/in/vineeth-vuppala-331b4935a/?originalSubdomain=in" target="_blank" rel="noopener noreferrer" className="ml-1 text-blue-500 dark:text-blue-400 hover:text-blue-400 dark:hover:text-blue-300 transition-colors" title="LinkedIn">
-                  <Linkedin className="h-5 w-5" />
+                  <Linkedin className="h-4 w-4 sm:h-5 sm:w-5" />
                 </a>
               </li>
             </ul>
@@ -269,12 +268,12 @@ const Index = () => {
           {/* Connect with Us - Column 3 */}
           <div className="text-left">
             <h4 className="font-bold text-base mb-2 text-neutral-900 dark:text-neutral-100">Connect with Us</h4>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2 sm:gap-3">
               <div className="flex items-center gap-2">
-                <Mail className="h-5 w-5 text-purple-500 dark:text-purple-400" />
-                <span className="font-medium text-neutral-900 dark:text-neutral-100">Email Support</span>
+                <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500 dark:text-purple-400" />
+                <span className="font-medium text-neutral-900 dark:text-neutral-100 text-xs sm:text-sm">Email Support</span>
               </div>
-              <a href="mailto:miniprojectpricecomparepro@gmail.com" className="text-pink-600 dark:text-pink-400 hover:text-pink-400 dark:hover:text-pink-300 transition-colors font-medium break-all" title="Email Support">
+              <a href="mailto:miniprojectpricecomparepro@gmail.com" className="text-pink-600 dark:text-pink-400 hover:text-pink-400 dark:hover:text-pink-300 transition-colors font-medium break-all text-xs sm:text-sm" title="Email Support">
                 miniprojectpricecomparepro@gmail.com
               </a>
               <p className="text-neutral-600 dark:text-neutral-300 text-xs">Have feedback or need help? We'd love to hear from you!</p>
@@ -286,22 +285,22 @@ const Index = () => {
             <h4 className="font-bold text-base mb-2 text-neutral-900 dark:text-neutral-100">Legal</h4>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors flex items-center gap-2">
+                <a href="#" className="text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors flex items-center gap-2 text-xs sm:text-sm">
                   <span>Terms and Conditions</span>
                 </a>
               </li>
               <li>
-                <a href="#" className="text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors flex items-center gap-2">
+                <a href="#" className="text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors flex items-center gap-2 text-xs sm:text-sm">
                   <span>Privacy Policy</span>
                 </a>
               </li>
               <li>
-                <a href="#" className="text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors flex items-center gap-2">
+                <a href="#" className="text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors flex items-center gap-2 text-xs sm:text-sm">
                   <span>Cookie Policy</span>
                 </a>
               </li>
               <li>
-                <a href="#" className="text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors flex items-center gap-2">
+                <a href="#" className="text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors flex items-center gap-2 text-xs sm:text-sm">
                   <span>Disclaimer</span>
                 </a>
               </li>

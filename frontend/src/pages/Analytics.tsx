@@ -198,35 +198,37 @@ const Analytics = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900">
-      {/* Header */}
+      {/* Header - Responsive */}
       <header className="glass-effect border-b border-purple-200/30 dark:border-purple-500/20 sticky top-0 z-50 backdrop-blur-xl bg-white/50 dark:bg-slate-900/50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-2">
+            {/* Left Section */}
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/')}
-                className="hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-all duration-300 hover:scale-110"
+                className="hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-all duration-300 hover:scale-110 flex-shrink-0"
               >
-                <ArrowLeft className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-400" />
               </Button>
-              <div className="flex items-center gap-3">
-                <div className="relative">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                <div className="relative flex-shrink-0">
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 rounded-xl blur-lg opacity-50 animate-pulse"></div>
-                  <div className="relative bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 p-2.5 rounded-xl">
-                    <BarChart3 className="h-6 w-6 text-white" />
+                  <div className="relative bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 p-1.5 sm:p-2.5 rounded-xl">
+                    <BarChart3 className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
                   </div>
                 </div>
-                <div>
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+                <div className="min-w-0">
+                  <h1 className="text-base sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent truncate">
                     Analytics Dashboard
                   </h1>
-                  <p className="text-xs text-muted-foreground">Track your shopping insights</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">Track your shopping insights</p>
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-4">
+            {/* Right Section */}
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               <ThemeToggle />
               <UserProfileDropdown />
             </div>
@@ -234,10 +236,10 @@ const Analytics = () => {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        {/* Overview Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      {/* Main Content - Responsive */}
+      <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
+        {/* Overview Stats - Responsive Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
           <Card className="glass-effect border-purple-200/30 dark:border-purple-500/20 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 hover:scale-105 group overflow-hidden relative">
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">

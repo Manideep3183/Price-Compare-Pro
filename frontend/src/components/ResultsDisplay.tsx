@@ -35,7 +35,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ products, isLoad
   const displayedTotal = displayedProducts.length;
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
         {Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
@@ -51,12 +51,12 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ products, isLoad
 
   if (totalProducts === 0) {
     return (
-      <div className="text-center py-16 animate-fade-in">
+      <div className="text-center py-12 sm:py-16 px-4 animate-fade-in">
         <div className="animate-float mb-4">
-          <ShoppingBag className="h-24 w-24 mx-auto text-muted-foreground/30" />
+          <ShoppingBag className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 mx-auto text-muted-foreground/30" />
         </div>
-        <h3 className="text-2xl font-semibold mb-2">No Results Yet</h3>
-        <p className="text-muted-foreground max-w-md mx-auto">
+        <h3 className="text-xl sm:text-2xl font-semibold mb-2">No Results Yet</h3>
+        <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto">
           Start by searching for a product above. We'll compare prices across multiple retailers
           and show you the best deals with AI-powered recommendations.
         </p>
@@ -88,39 +88,39 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ products, isLoad
       {/* AI Recommendation at the top */}
       <AIRecommendation products={allProducts} />
 
-      {/* Price Stats Card */}
+      {/* Price Stats Card - Responsive */}
       {(priceStats?.low !== undefined || priceStats?.avg !== undefined || priceStats?.high !== undefined) && (
-        <div className="mb-6 rounded-2xl glass-effect border-2 border-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 shadow-lg shadow-yellow-200/30 bg-gradient-to-br from-yellow-50 via-pink-50 to-purple-50 px-6 py-5 flex flex-col md:flex-row gap-6 items-center animate-fade-in">
-          <div className="flex items-center gap-3">
-            <TrendingDown className="h-6 w-6 text-green-500" />
-            <span className="font-semibold text-base">Lowest Price:</span>
-            <span className="font-bold text-green-500 text-lg">₹{priceStats?.low ?? '-'}</span>
+        <div className="mb-4 sm:mb-6 rounded-xl sm:rounded-2xl glass-effect border-2 border-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 shadow-lg shadow-yellow-200/30 bg-gradient-to-br from-yellow-50 via-pink-50 to-purple-50 px-4 sm:px-6 py-4 sm:py-5 flex flex-col sm:flex-row gap-3 sm:gap-6 items-start sm:items-center animate-fade-in">
+          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+            <TrendingDown className="h-5 w-5 sm:h-6 sm:w-6 text-green-500 flex-shrink-0" />
+            <span className="font-semibold text-sm sm:text-base">Lowest Price:</span>
+            <span className="font-bold text-green-500 text-base sm:text-lg ml-auto sm:ml-0">₹{priceStats?.low ?? '-'}</span>
           </div>
-          <div className="flex items-center gap-3">
-            <Star className="h-6 w-6 text-yellow-500" />
-            <span className="font-semibold text-base">Average Price:</span>
-            <span className="font-bold text-yellow-500 text-lg">₹{priceStats?.avg ?? '-'}</span>
+          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+            <Star className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-500 flex-shrink-0" />
+            <span className="font-semibold text-sm sm:text-base">Average Price:</span>
+            <span className="font-bold text-yellow-500 text-base sm:text-lg ml-auto sm:ml-0">₹{priceStats?.avg ?? '-'}</span>
           </div>
-          <div className="flex items-center gap-3">
-            <TrendingUp className="h-6 w-6 text-red-500" />
-            <span className="font-semibold text-base">Highest Price:</span>
-            <span className="font-bold text-red-500 text-lg">₹{priceStats?.high ?? '-'}</span>
+          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+            <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-red-500 flex-shrink-0" />
+            <span className="font-semibold text-sm sm:text-base">Highest Price:</span>
+            <span className="font-bold text-red-500 text-base sm:text-lg ml-auto sm:ml-0">₹{priceStats?.high ?? '-'}</span>
           </div>
         </div>
       )}
 
-      <div className="flex items-center justify-between px-2">
-        <h2 className="text-3xl font-bold animate-fade-in-up bg-gradient-primary bg-clip-text text-transparent">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 px-2">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold animate-fade-in-up bg-gradient-primary bg-clip-text text-transparent">
           Showing {displayedTotal} of {totalProducts} {totalProducts === 1 ? 'Product' : 'Products'}
         </h2>
-        <p className="text-base text-muted-foreground">
+        <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
           From {platformNames.join(', ')} • Sorted by best value
         </p>
       </div>
 
-      <div className="space-y-8">
-        {/* Products grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="space-y-6 sm:space-y-8">
+        {/* Products grid - Responsive */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {displayedProducts.map((product, index) => (
             <div
               key={`product-${index}`}
