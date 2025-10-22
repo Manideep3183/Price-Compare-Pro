@@ -129,7 +129,7 @@ const Index = () => {
       toast({
         title: 'Search Failed',
         description: axios.isAxiosError(error)
-          ? error.response?.data?.detail || 'Unable to connect to the backend. Make sure the FastAPI server is running on http://127.0.0.1:8000'
+          ? error.response?.data?.detail || 'Unable to connect to the backend. Please check your internet connection and try again.'
           : 'An unexpected error occurred. Please try again.',
         variant: 'destructive',
       });
