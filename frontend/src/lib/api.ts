@@ -2,7 +2,7 @@ import axios from 'axios';
 import { AuthAPI } from './firebase';
 
 // Support both VITE_API_URL (production) and VITE_API_BASE_URL (development)
-const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'https://price-compare-pro-1.onrender.com';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
