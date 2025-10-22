@@ -4,6 +4,12 @@ import { AuthAPI } from './firebase';
 // Support both VITE_API_URL (production) and VITE_API_BASE_URL (development)
 const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'https://price-compare-pro-1.onrender.com';
 
+console.log('🔧 API Configuration:', {
+  VITE_API_URL: import.meta.env.VITE_API_URL,
+  VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
+  Final_API_BASE_URL: API_BASE_URL
+});
+
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {

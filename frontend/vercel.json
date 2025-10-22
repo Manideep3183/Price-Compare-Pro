@@ -1,4 +1,8 @@
 {
+  "buildCommand": "npm run build",
+  "env": {
+    "VITE_API_URL": "https://price-compare-pro-1.onrender.com"
+  },
   "rewrites": [
     {
       "source": "/(.*)",
