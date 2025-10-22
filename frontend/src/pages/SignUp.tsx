@@ -85,15 +85,14 @@ export const SignUp = () => {
           auth_provider: 'google',
         });
         console.log('✅ Google user profile created in MongoDB');
-        navigate('/');
       } catch (profileError) {
         console.error('⚠️ Failed to create profile:', profileError);
-        setError('Failed to complete sign-up. Please try again.');
-        
-        // Sign out the user on error
-        const { auth } = await import('@/lib/firebase');
-        await auth.signOut();
+        // Don't block signup if profile creation fails - profile will be created on Index page
+        console.log('⚠️ Proceeding with signup, profile will be created on home page');
       }
+      
+      // Always navigate to home after successful authentication
+      navigate('/');
     } catch (err: any) {
       setError(err.message || 'Failed to sign up with Google.');
     } finally {

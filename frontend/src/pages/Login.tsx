@@ -73,16 +73,14 @@ export const Login = () => {
           auth_provider: 'google',
         });
         console.log('✅ Google user logged in successfully');
-        navigate('/');
       } catch (profileError) {
         console.error('⚠️ Failed to create/update profile:', profileError);
-        // If profile creation fails, user might need to sign up first
-        setError('Failed to complete sign-in. Please try signing up if you are a new user.');
-        
-        // Sign out the user on error
-        const { auth } = await import('@/lib/firebase');
-        await auth.signOut();
+        // Don't block login if profile creation fails - profile will be created on Index page
+        console.log('⚠️ Proceeding with login, profile will be created on home page');
       }
+      
+      // Always navigate to home after successful authentication
+      navigate('/');
     } catch (err: any) {
       setError(err.message || 'Failed to login with Google.');
     } finally {
